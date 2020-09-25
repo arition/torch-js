@@ -1,7 +1,7 @@
 "use strict";
 const torch = require("../dist");
 
-var test_model_path = __dirname + "/test_model.pt";
+var test_model_path = __dirname + "/resources/test_model.pt";
 
 var script_module = new torch.ScriptModule(test_model_path);
 console.log(script_module.toString());
