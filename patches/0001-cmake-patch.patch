@@ -1,14 +1,14 @@
-From 2dbae2d1da3c39606c5021e644841bfd6bcb0b44 Mon Sep 17 00:00:00 2001
+From 4c3a7bfcc08658ab84f96e36871b7c31d12b47f8 Mon Sep 17 00:00:00 2001
 From: arition <aritionkb@gmail.com>
-Date: Thu, 27 Aug 2020 18:22:59 -0700
+Date: Fri, 25 Sep 2020 03:09:56 -0700
 Subject: [PATCH] cmake patch
 
 ---
- CMakeLists.txt | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ CMakeLists.txt | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index fa50f15..69d9984 100644
+index fa50f15..171642d 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -8,6 +8,8 @@ option(WITH_CUDA "Enable CUDA support" OFF)
@@ -31,12 +31,14 @@ index fa50f15..69d9984 100644
  
  include(GNUInstallDirs)
  include(CMakePackageConfigHelpers)
-@@ -65,3 +65,6 @@ if(WITH_CUDA)
+@@ -65,3 +65,8 @@ if(WITH_CUDA)
      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}/cuda)
  endif()
  install(FILES ${MODELS_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}/models)
 +
-+set_property(TARGET torch_cuda PROPERTY INTERFACE_COMPILE_OPTIONS "")  
++if(WITH_CUDA)
++  set_property(TARGET torch_cuda PROPERTY INTERFACE_COMPILE_OPTIONS "")
++endif()
 +set_property(TARGET torch_cpu PROPERTY INTERFACE_COMPILE_OPTIONS "")
 -- 
 2.27.0.windows.1
