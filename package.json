@@ -3,7 +3,7 @@
   "version": "0.5.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "author": "Kittipat Virochsiri, arition",
+  "author": "Kittipat Virochsiri, arition, raghavmecheri",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -14,14 +14,13 @@
     "build": "node build.js",
     "compile": "cmake-js compile",
     "rebuild": "cmake-js rebuild",
-    "test": "NODE_ENV=test mocha --require @babel/register ./tests/*.test.js"
+    "test": "NODE_ENV=test jest --verbose"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
-    "@babel/register": "^7.10.5",
+    "@babel/preset-env": "^7.11.5",
     "@types/node": "^14.6.0",
-    "chai": "^4.2.0",
-    "mocha": "^8.1.1",
+    "jest": "^26.4.2",
     "typescript": "^4.0.2"
   },
   "dependencies": {
