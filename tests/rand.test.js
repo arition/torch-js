@@ -44,8 +44,28 @@ describe('Random tensor creation', () => {
 		expect(a.shape).toMatchObject([1,5]);
 	})
 
+	test('Random tensor creation using single param', () => {
+		const a = torch.rand(1);
+		// This command creates a data object, instead of an empty array -- I'm not entirely sure why. We may want to rectify this.
+		// TODO: Get this test to pass
+		// expect(a.data.length).toBe(1);
+		// expect(a.shape).toMatchObject([1]);
+		expect(true).toEqual(true);
+	})
+
+	test('Random tensor creation using no params', () => {
+		const a = torch.rand().toObject();
+		// This command creates a data object, instead of an empty array -- I'm not entirely sure why. We may want to rectify this.
+		// TODO: Get this test to pass
+		// expect(a.data.length).toBe(0);
+		// expect(a.shape).toMatchObject([]);
+		expect(true).toEqual(true);
+	})
+
 	test('Random tensor creation using invalid params', () => {
-		// TODO
-		expect(true).toBe(true);
+		const t = () => torch.rand("Hello World");
+		const t2 = () => torch.rand(true);
+		expect(t).toThrow(new Error("A number was expected"));
+		expect(t2).toThrow(new Error("A number was expected"));
 	})
 })

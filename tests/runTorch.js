@@ -11,10 +11,12 @@ console.log(`CUDA Avaliable: ${torch.ScriptModule.isCudaAvailable()}`)
 async function test() {
   // Testing rand() with variable number of arguments
   var a = torch.rand(1, 5);
-  console.log(a.toObject());
+
   // Testing rand() with shape array
   var b = torch.rand([1, 5]);
-  console.log(b.toObject());
+  console.log(typeof b.toObject().shape);
+  console.log(b.toObject().shape.constructor.name);
+  console.log(typeof [1,2,3,4,5]);
 
   var c = await script_module.forward(a, b);
   console.log(c.toObject());
