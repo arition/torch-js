@@ -129,5 +129,5 @@ if(Test-Path -Path $CUDNN_ZIP_LOCAL){
 }
 
 Expand-Archive -Path $CUDNN_ZIP_LOCAL -DestinationPath $CUDA_PATH
-$CUDNN_EXPAND_LOCAL = Join-Path $CUDA_PATH "cuda" "*"
-Move-Item -Path $CUDNN_EXPAND_LOCAL -Destination $CUDA_PATH
+$CUDNN_EXPAND_LOCAL = Join-Path $CUDA_PATH "cuda"
+Move-Item -Path "$($CUDNN_EXPAND_LOCAL)/*" -Destination $CUDA_PATH
