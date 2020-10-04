@@ -28,7 +28,7 @@ jobs:
         run: yarn upgrade --dev
 
       - name: Prebuild
-        run: yarn prebuild
+        run: yarn prebuild -u ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
         run: yarn build
