@@ -15,6 +15,10 @@ $CUDA_PACKAGES_IN = @(
     "nvcc";
     "visual_studio_integration";
     "curand_dev";
+    "cublas_dev";
+    "cufft_dev";
+    "cusolver_dev";
+    "cusparse_dev";
     "nvrtc_dev";
     "cudart";
 )
