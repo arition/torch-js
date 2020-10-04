@@ -130,4 +130,4 @@ if(Test-Path -Path $CUDNN_ZIP_LOCAL){
 
 Expand-Archive -Path $CUDNN_ZIP_LOCAL -DestinationPath $TEMP_PATH
 $CUDNN_EXPAND_LOCAL = Join-Path $TEMP_PATH "cuda"
-Copy-Item -Path "$($CUDNN_EXPAND_LOCAL)/*" -Destination $CUDA_PATH
+Copy-Item -Path "$($CUDNN_EXPAND_LOCAL)/*" -Destination $CUDA_PATH -Filter *.* -Force -recurse
