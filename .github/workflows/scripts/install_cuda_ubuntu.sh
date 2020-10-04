@@ -122,8 +122,8 @@ echo "APT_KEY_URL ${APT_KEY_URL}"
 ## Install
 ## -----------------
 echo "Adding CUDA Repository"
-wget ${PIN_URL}
-sudo mv ${PIN_FILENAME} /etc/apt/preferences.d/cuda-repository-pin-600
+# wget ${PIN_URL}
+# sudo mv ${PIN_FILENAME} /etc/apt/preferences.d/cuda-repository-pin-600
 sudo apt-key adv --fetch-keys ${APT_KEY_URL}
 sudo add-apt-repository "deb ${REPO_URL} /"
 sudo add-apt-repository "deb ${CUDNN_REPO_URL} /"
