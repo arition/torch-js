@@ -26,6 +26,7 @@ $CUDA_PACKAGES_IN = @(
 
 # Get the cuda version from the environment as env:cuda.
 $CUDA_VERSION_FULL = $env:cuda
+$CUDNN_VERSION = $env:cudnn
 # Make sure CUDA_VERSION_FULL is set and valid, otherwise error.
 
 # Validate CUDA version, extracting components via regex
@@ -75,7 +76,8 @@ if($CUDA_KNOWN_URLS.containsKey($CUDA_VERSION_FULL)){
     Write-Output "note: URL for CUDA ${$CUDA_VERSION_FULL} not known, estimating."
     $CUDA_REPO_PKG_REMOTE="http://developer.download.nvidia.com/compute/cuda/$($CUDA_MAJOR).$($CUDA_MINOR)/Prod/network_installers/cuda_$($CUDA_VERSION_FULL)_win10_network.exe"
 }
-$CUDA_REPO_PKG_LOCAL="cuda_$($CUDA_VERSION_FULL)_win10_network.exe"
+$TEMP_PATH = [System.IO.Path]::GetTempPath()
+$CUDA_REPO_PKG_LOCAL = Join-Path $TEMP_PATH "cuda_$($CUDA_VERSION_FULL)_win10_network.exe"
 
 
 ## ------------
@@ -114,3 +116,18 @@ Write-Output "CUDA_PATH_VX_Y $($CUDA_PATH_VX_Y)"
 # PATH needs updating elsewhere, anything in here won't persist.
 # Append $CUDA_PATH/bin to path.
 # Set CUDA_PATH as an environmental variable
+
+$CUDNN_ZIP_REMOTE = "http://developer.download.nvidia.com/compute/redist/cudnn/v7.6.5/cudnn-10.2-windows10-x64-v7.6.5.32.zip"
+$CUDNN_ZIP_LOCAL = Join-Path $TEMP_PATH "cudnn.zip"
+
+Invoke-WebRequest $CUDNN_ZIP_REMOTE -OutFile $CUDNN_ZIP_LOCAL | Out-Null
+if(Test-Path -Path $CUDNN_ZIP_LOCAL){
+    Write-Output "Downloading Complete"
+} else {
+    Write-Output "Error: Failed to download $($CUDNN_ZIP_LOCAL) from $($CUDNN_ZIP_REMOTE)"
+    exit 1
+}
+
+Expand-Archive -Path $CUDNN_ZIP_LOCAL -DestinationPath $CUDA_PATH
+$CUDNN_EXPAND_LOCAL = Join-Path $CUDA_PATH "cuda" "*"
+Move-Item -Path $CUDNN_EXPAND_LOCAL -Destination $CUDA_PATH

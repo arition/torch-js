@@ -47,6 +47,7 @@ function version_lt() {
 
 # Get the cuda version from the environment as $cuda.
 CUDA_VERSION_MAJOR_MINOR=${cuda}
+CUDNN_VERSION=${cudnn}
 
 # Split the version.
 # We (might/probably) don't know PATCH at this point - it depends which version gets installed.
@@ -146,3 +147,8 @@ export CUDA_PATH=${CUDA_PATH}
 export PATH="$CUDA_PATH/bin:$PATH"
 export LD_LIBRARY_PATH="$CUDA_PATH/lib:$LD_LIBRARY_PATH"
 nvcc -V
+
+apt-get update && apt-get install -y --no-install-recommends \
+    libcudnn7=${CUDNN_VERSION}-1+cuda${CUDA_MAJOR}.${CUDA_MINOR} \
+    libcudnn7-dev=${CUDNN_VERSION}-1+cuda${CUDA_MAJOR}.${CUDA_MINOR} \
+    && apt-mark hold libcudnn7
