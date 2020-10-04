@@ -112,6 +112,7 @@ PIN_FILENAME="cuda-ubuntu${UBUNTU_VERSION}.pin"
 PIN_URL="https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION}/x86_64/${PIN_FILENAME}"
 APT_KEY_URL="http://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION}/x86_64/7fa2af80.pub"
 REPO_URL="http://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION}/x86_64/"
+CUDNN_REPO_URL="https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu${UBUNTU_VERSION}/x86_64/"
 
 echo "PIN_FILENAME ${PIN_FILENAME}"
 echo "PIN_URL ${PIN_URL}"
@@ -125,6 +126,7 @@ wget ${PIN_URL}
 sudo mv ${PIN_FILENAME} /etc/apt/preferences.d/cuda-repository-pin-600
 sudo apt-key adv --fetch-keys ${APT_KEY_URL}
 sudo add-apt-repository "deb ${REPO_URL} /"
+sudo add-apt-repository "deb ${CUDNN_REPO_URL} /"
 sudo apt-get update
 
 echo "Installing CUDA packages ${CUDA_PACKAGES}"
