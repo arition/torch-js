@@ -27,6 +27,9 @@ jobs:
       - name: Install packages
         run: yarn upgrade --dev
 
+      - name: Prebuild
+        run: yarn prebuild
+
       - name: Build
         run: yarn build
 

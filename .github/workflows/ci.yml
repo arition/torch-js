@@ -32,7 +32,13 @@ jobs:
           python-version: '3.8'
 
       - name: Install packages
-        run: yarn
+        run: yarn upgrade --dev
+
+      - name: Compile
+        run: yarn compile
+
+      - name: Prebuild
+        run: yarn prebuild
 
       - name: Build
         run: yarn build
