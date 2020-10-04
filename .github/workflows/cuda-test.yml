@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [cuda-test]
+  pull_request:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install CUDA on windows-latest
+        if: ${{ matrix.os == 'windows-latest' }}
+        shell: powershell
+        env:
+          cuda: "10.2"
+        run: |
+          # Install CUDA via a powershell script
+          .\.github\workflows\scripts\install_cuda_windows.ps1
+          if ($?) {
+            # Set paths for subsequent steps, using $env:CUDA_PATH
+            echo "Adding CUDA to CUDA_PATH, CUDA_PATH_X_Y and PATH"
+            echo "::set-env name=CUDA_PATH::$env:CUDA_PATH"
+            echo "::set-env name=$env:CUDA_PATH_VX_Y::$env:CUDA_PATH"
+            echo "::add-path::$env:CUDA_PATH/bin"
+          }
+
+      - name: Install CUDA on ubuntu-latest
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        shell: bash
+        env:
+          cuda: "10.2"
+        run: |
+          source ./.github/workflows/scripts/install_cuda_ubuntu.sh
+          if [[ $? -eq 0 ]]; then
+            # Set paths for subsequent steps, using ${CUDA_PATH}
+            echo "Adding CUDA to CUDA_PATH, PATH and LD_LIBRARY_PATH"
+            echo "::set-env name=CUDA_PATH::${CUDA_PATH}"
+            echo "::add-path::${CUDA_PATH}/bin"
+            echo "::set-env name=LD_LIBRARY_PATH::${CUDA_PATH}/lib:${LD_LIBRARY_PATH}"
+          fi
+
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14"
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install packages
+        run: yarn upgrade --dev
+
+      - name: Compile
+        run: yarn compile
+
+      - name: Prebuild
+        run: yarn prebuild
+
+      - name: Build
+        run: yarn build
