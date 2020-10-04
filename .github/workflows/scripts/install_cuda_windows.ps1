@@ -107,11 +107,6 @@ if (!$?) {
 # Store the CUDA_PATH in the environment for the current session, to be forwarded in the action.
 $CUDA_PATH = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$($CUDA_MAJOR).$($CUDA_MINOR)"
 $CUDA_PATH_VX_Y = "CUDA_PATH_V$($CUDA_MAJOR)_$($CUDA_MINOR)" 
-# Set environmental variables in this session
-$env:CUDA_PATH = "$($CUDA_PATH)"
-$env:CUDA_PATH_VX_Y = "$($CUDA_PATH_VX_Y)"
-Write-Output "CUDA_PATH $($CUDA_PATH)"
-Write-Output "CUDA_PATH_VX_Y $($CUDA_PATH_VX_Y)"
 
 # PATH needs updating elsewhere, anything in here won't persist.
 # Append $CUDA_PATH/bin to path.
@@ -128,6 +123,16 @@ if(Test-Path -Path $CUDNN_ZIP_LOCAL){
     exit 1
 }
 
+Write-Output "Installing CUDNN"
+
 Expand-Archive -Path $CUDNN_ZIP_LOCAL -DestinationPath $TEMP_PATH
 $CUDNN_EXPAND_LOCAL = Join-Path $TEMP_PATH "cuda"
 Copy-Item -Path "$($CUDNN_EXPAND_LOCAL)/*" -Destination $CUDA_PATH -Filter *.* -Force -recurse
+
+# Set environmental variables in this session
+$env:CUDA_PATH = "$($CUDA_PATH)"
+$env:CUDA_PATH_VX_Y = "$($CUDA_PATH_VX_Y)"
+Write-Output "CUDA_PATH $($CUDA_PATH)"
+Write-Output "CUDA_PATH_VX_Y $($CUDA_PATH_VX_Y)"
+
+tree $CUDA_PATH /f
