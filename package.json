@@ -14,7 +14,7 @@
     "build": "node build.js",
     "compile": "cmake-js compile",
     "rebuild": "cmake-js rebuild",
-    "prebuild": "prebuild -t 3 -r napi --include-regex '\"\\.(node|so|dll)$\"' --backend cmake-js"
+    "prebuild": "prebuild -t 3 -r napi --include-regex '\\.[nsd][ol][dl]?e?$' --backend cmake-js"
   },
   "devDependencies": {
     "@types/node": "^14.6.0",
