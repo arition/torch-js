@@ -68,9 +68,6 @@ jobs:
       - name: Install packages
         run: yarn upgrade --dev
 
-      - name: Compile
-        run: yarn compile
-
       - name: Prebuild
         run: yarn prebuild
 
