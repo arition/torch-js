@@ -21,14 +21,17 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: '14'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "14"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install packages
         run: yarn upgrade --dev
 
       - name: Build
         run: yarn build
+
+      - name: Run test suite
+        run: yarn test
 
       - name: Publish
         run: yarn publish
