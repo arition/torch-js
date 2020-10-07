@@ -1,0 +1,18 @@
+# Ignore artifacts:
+build
+coverage
+dist
+patches
+src
+
+# Ignore config files:
+.*
+*.lock
+
+# Ignore JSON:
+*.json
+
+# Other stuff:
+node_modules/
+.github/
+*.log
