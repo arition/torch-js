@@ -13,7 +13,7 @@ describe('Constructor', () => {
 	// TODO -- Fine tune error message to remove stacktrace for error thrown on invalid model file
 	test('Call constructor from invalid model path', () => {
 		const t = () => new torch.ScriptModule("/resources/no_model.pt")
-		// expect(t).toThrow(new Error("open file failed, file path: /resources/no_model.pt"))
+		expect(t).toThrow(new RegExp("open file failed, file path: /resources/no_model.pt.*"))
 		expect(true).toEqual(true);	
 	})
 
@@ -59,20 +59,17 @@ describe('Forward function', () => {
 			[0.4, 0.5, 0.6],
 		]);
 		const res = await script_module.forward(a, b);
-		// This returns an object for the data key as well -- is this intentional?
+		expect(res.toObject().data.length).toEqual(6);
 		expect(res.toObject().shape).toMatchObject([2,3]);
 	})
 
-	// TODO -- Fine tune error message to remove stacktrace for missing arguement value
+	// TODO -- Fine tune error message to remove stacktrace for missing arguement value -- at the moment, the multiple lines make it difficult to test for an error message
 	test('Call to forward using missing second tensor param', async () => {
-		expect.assertions(1);
-
 		const script_module = new torch.ScriptModule(test_model_path)
 		const a = torch.tensor([
 			[0.1, 0.2, 0.3],
 			[0.4, 0.5, 0.6],
 		]);
-		//expect(script_module.forward(a)).rejects.toEqual("Error: forward() is missing value for argument 'input2'. Declaration: forward(__torch__.test_model self, Tensor input1, Tensor input2) -> (Tensor)")
-		expect(true).toEqual(true);
+		expect(script_module.forward(a)).rejects.toThrow(new RegExp(/[\s\S]/))
 	})
 })

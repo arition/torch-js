@@ -45,21 +45,15 @@ describe('Random tensor creation', () => {
 	})
 
 	test('Random tensor creation using single param', () => {
-		const a = torch.rand(1);
-		// This command creates a data object, instead of an empty array -- I'm not entirely sure why. We may want to rectify this.
-		// TODO: Get this test to pass
-		// expect(a.data.length).toBe(1);
-		// expect(a.shape).toMatchObject([1]);
-		expect(true).toEqual(true);
+		const a = torch.rand(1).toObject();
+		expect(a.data.length).toBe(1);
+		expect(a.shape.length).toBe(1);
 	})
 
 	test('Random tensor creation using no params', () => {
 		const a = torch.rand().toObject();
-		// This command creates a data object, instead of an empty array -- I'm not entirely sure why. We may want to rectify this.
-		// TODO: Get this test to pass
-		// expect(a.data.length).toBe(0);
-		// expect(a.shape).toMatchObject([]);
-		expect(true).toEqual(true);
+		expect(a.data.length).toBe(1);
+		expect(a.shape.length).toBe(0);
 	})
 
 	test('Random tensor creation using invalid params', () => {
