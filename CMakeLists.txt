@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project (torch-js)
 
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(MACOS TRUE)
 endif()
@@ -29,7 +26,7 @@ execute_process(
 )
 endif()
 else()
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip")
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/build/libtorch")
 if(WIN32)
 file(DOWNLOAD https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-1.6.0%2Bcpu.zip ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip)
 elseif(APPLE)
