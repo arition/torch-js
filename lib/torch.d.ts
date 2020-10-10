@@ -33,9 +33,8 @@ export class Tensor {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface, no-use-before-define
 interface TorchTypesArray extends Array<TorchTypes> {}
-// eslint-disable-next-line @typescript-eslint/no-empty-interface, no-use-before-define
-interface TorchTypesRecord
-  extends Record<string | number | symbol, TorchTypes> {}
+interface TorchTypesRecord // eslint-disable-line @typescript-eslint/no-empty-interface
+  extends Record<string | number | symbol, TorchTypes> {} // eslint-disable-line no-use-before-define
 
 type TorchTypes =
   | TorchTypesArray
