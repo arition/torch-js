@@ -5,11 +5,40 @@
   },
   "extends": ["airbnb-base", "prettier"],
   "parser": "babel-eslint",
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "env": { "es6": true, "node": true },
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "globals": { "Atomics": "readonly", "SharedArrayBuffer": "readonly" },
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "ecmaFeatures": { "jsx": true },
+        "ecmaVersion": 2018,
+        "sourceType": "module",
+        "project": "./tsconfig.json"
+      },
+      "plugins": ["@typescript-eslint"],
+      "rules": {
+        "indent": ["error", 2, { "SwitchCase": 1 }],
+        "linebreak-style": ["error", "unix"],
+        "@typescript-eslint/no-explicit-any": 0,
+        "@typescript-eslint/no-useless-constructor": 0
+      }
+    }
+  ],
   "parserOptions": {
     "ecmaVersion": 12,
     "sourceType": "module"
   },
   "rules": {
-    "indent": ["error", 2]
+    "indent": ["error", 2],
+    "no-useless-constructor": 0,
+    "no-param-reassign": 0,
+    "max-classes-per-file": ["error", 3]
   }
 }

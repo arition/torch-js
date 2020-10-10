@@ -1,13 +1,14 @@
-'use strict';
-import assert = require('assert');
-import torch = require('./torch');
-export * from './torch';
+import assert = require("assert");
+import torch = require("./torch");
 
-type Matrix = number[]|NestedArray;
-interface NestedArray extends Array<Matrix> {}
+export * from "./torch";
+
+// eslint-disable-next-line no-use-before-define
+type Matrix = number[] | NestedArray;
+type NestedArray = Array<Matrix>;
 
 function flattenArray(arr: Matrix) {
-  let shape = [arr.length];
+  const shape = [arr.length];
   while (arr.length > 0 && Array.isArray(arr[0])) {
     shape.push((arr[0] as Matrix).length);
     // Forcing Array<any> is required to make TS happy; otherwise, TS2349
@@ -18,8 +19,9 @@ function flattenArray(arr: Matrix) {
     assert.strictEqual(arr.length, numel);
   }
   return {
-    data: (arr as number[]), shape: shape,
-  }
+    data: arr as number[],
+    shape,
+  };
 }
 
 function typedArrayType(dtype: number) {
@@ -31,28 +33,29 @@ function typedArrayType(dtype: number) {
     case torch.int32:
       return Int32Array;
     default:
-      throw new TypeError('Unsupported dtype');
+      throw new TypeError("Unsupported dtype");
   }
 }
 
-type TensorDataCompatible = Float32Array|Float64Array|Int32Array|Matrix;
+type TensorDataCompatible = Float32Array | Float64Array | Int32Array | Matrix;
 
 export function tensor(
-    data: TensorDataCompatible,
-    {dtype = torch.float32, shape}: {dtype?: number, shape?: number[]} = {}) {
+  data: TensorDataCompatible,
+  { dtype = torch.float32, shape }: { dtype?: number; shape?: number[] } = {}
+): torch.Tensor {
   if (Array.isArray(data)) {
-    const array_and_shape = flattenArray(data);
-    const typed_array = new (typedArrayType(dtype))(array_and_shape.data);
+    const arrayAndShape = flattenArray(data);
+    const typedArray = new (typedArrayType(dtype))(arrayAndShape.data);
     return torch.Tensor.fromObject({
-      data: typed_array,
-      shape: array_and_shape.shape,
+      data: typedArray,
+      shape: arrayAndShape.shape,
     });
   }
   if (shape === undefined) {
     shape = [data.length];
   }
   return torch.Tensor.fromObject({
-    data: data,
-    shape: shape,
+    data,
+    shape,
   });
 }

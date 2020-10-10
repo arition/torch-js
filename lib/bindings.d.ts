@@ -1,10 +1,10 @@
 type bindingFunction = (mod: string) => any;
 interface bindingInterface extends bindingFunction {
   getRoot: (file: string) => string;
-  getFileName: (calling_file?: string) => string;
+  getFileName: (callingFile?: string) => string;
 }
-declare var bindings: bindingInterface;
+declare let bindings: bindingInterface;
 
-declare module 'bindings' {
+declare module "bindings" {
   export = bindings;
 }
