@@ -31,7 +31,7 @@ namespace torchjs
       #ifdef _WIN32
       return Napi::Boolean::New(info.Env(), putenv(std::string(name + "=" + path).c_str()) == 0);
       #else
-      return Napi::Boolean::New(info.Env(), setenv(name, path.c_str(), 1) == 0);
+      return Napi::Boolean::New(info.Env(), setenv(name.c_str(), path.c_str(), 1) == 0);
       #endif
     }
 
