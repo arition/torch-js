@@ -3,6 +3,7 @@ project (torch-js)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(MACOS TRUE)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 endif()
 
 find_package(CUDA)
