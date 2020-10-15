@@ -24,13 +24,14 @@ namespace torchjs
 
     Napi::Value initenv(const Napi::CallbackInfo &info)
     {
-      if (info.Length() != 1 || !info[0].IsString())
-        throw Napi::Error::New(info.Env(), "Only support one string as parameter");
-      auto path = info[0].ToString().Utf8Value();
+      if (info.Length() != 2 || !info[0].IsString() || !info[1].IsString())
+        throw Napi::Error::New(info.Env(), "Only support two strings as parameter");
+      auto name = info[0].ToString().Utf8Value();
+      auto path = info[1].ToString().Utf8Value();
       #ifdef _WIN32
-      return Napi::Boolean::New(info.Env(), putenv(std::string("PATH=" + path).c_str()) == 0);
+      return Napi::Boolean::New(info.Env(), putenv(std::string(name + "=" + path).c_str()) == 0);
       #else
-      return Napi::Boolean::New(info.Env(), setenv("PATH", path.c_str(), 1) == 0);
+      return Napi::Boolean::New(info.Env(), setenv(name, path.c_str(), 1) == 0);
       #endif
     }
 
