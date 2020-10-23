@@ -38,10 +38,6 @@ class TestModule(torch.nn.Module):
 Once you have the trace file, it may be loaded into NodeJS like this
 
 ```javascript
-
-```
-
-```javascript
 const torch = require("torch-js");
 const modelPath = `test_model.pt`;
 const model = new torch.ScriptModule(testModelPath);
