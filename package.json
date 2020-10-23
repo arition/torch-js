@@ -10,7 +10,7 @@
     "url": "git+https://github.com/arition/torch-js.git"
   },
   "scripts": {
-    "install": "prebuild-install -r napi || cmake-js compile",
+    "install": "prebuild-install -r napi || source ./config.sh && cmake-js compile",
     "build": "node build.js",
     "compile": "cmake-js compile",
     "rebuild": "cmake-js rebuild",

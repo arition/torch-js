@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project (torch-js)
 
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
 find_package(CUDA)
 if(CUDA_FOUND)
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/build/libtorch")
