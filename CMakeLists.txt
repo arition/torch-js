@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project (torch-js)
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(MACOS TRUE)
-endif()
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 find_package(CUDA)
 if(CUDA_FOUND)
