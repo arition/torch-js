@@ -14,7 +14,7 @@
     "build": "node build.js",
     "compile": "cmake-js compile",
     "rebuild": "cmake-js rebuild",
-    "test": "jest --verbose",
+    "test": "jest --forceExit --verbose",
     "lint": "eslint ./",
     "build-prebuild": "prebuild -t 3 -r napi --include-regex \"\\.[nsd][oyl][dl]?[ie]?b?$\" --backend cmake-js"
   },
