@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]
     if: "!contains(github.event.head_commit.message, 'publish-prebuild skip')"
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -33,9 +33,9 @@ jobs:
           if ($?) {
             # Set paths for subsequent steps, using $env:CUDA_PATH
             echo "Adding CUDA to CUDA_PATH, CUDA_PATH_X_Y and PATH"
-            echo "::set-env name=CUDA_PATH::$env:CUDA_PATH"
-            echo "::set-env name=$env:CUDA_PATH_VX_Y::$env:CUDA_PATH"
-            echo "::add-path::$env:CUDA_PATH/bin"
+            echo "CUDA_PATH=$($env:CUDA_PATH)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            echo "$($env:CUDA_PATH_VX_Y)=$($env:CUDA_PATH)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            echo "$($env:CUDA_PATH)/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           }
 
       - name: Install CUDA on ubuntu-latest
@@ -49,9 +49,9 @@ jobs:
           if [[ $? -eq 0 ]]; then
             # Set paths for subsequent steps, using ${CUDA_PATH}
             echo "Adding CUDA to CUDA_PATH, PATH and LD_LIBRARY_PATH"
-            echo "::set-env name=CUDA_PATH::${CUDA_PATH}"
-            echo "::add-path::${CUDA_PATH}/bin"
-            echo "::set-env name=LD_LIBRARY_PATH::${CUDA_PATH}/lib:${LD_LIBRARY_PATH}"
+            echo "CUDA_PATH=${CUDA_PATH}" >> $GITHUB_ENV
+            echo "${CUDA_PATH}/bin" >> $GITHUB_PATH
+            echo "LD_LIBRARY_PATH=${CUDA_PATH}/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
           fi
 
       - name: Install node
