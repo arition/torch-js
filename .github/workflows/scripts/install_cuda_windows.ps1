@@ -30,8 +30,7 @@ $CUDA_PACKAGES_IN = @(
 
 # Get the cuda version from the environment as env:cuda.
 $CUDA_VERSION_FULL = $env:cuda
-$CUDNN_VERSION = $env:cudnn
-# Make sure CUDA_VERSION_FULL is set and valid, otherwise error.
+$CUDNN_VERSION_FULL = $env:cudnn
 
 # Validate CUDA version, extracting components via regex
 $cuda_ver_matched = $CUDA_VERSION_FULL -match "^(?<major>[1-9][0-9]*)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)$"
@@ -42,6 +41,17 @@ if(-not $cuda_ver_matched){
 $CUDA_MAJOR=$Matches.major
 $CUDA_MINOR=$Matches.minor
 $CUDA_PATCH=$Matches.patch
+
+# Validate CUDNN version, extracting components via regex
+$cudnn_ver_matched = $CUDNN_VERSION_FULL -match "^(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)\.(?<build>[0-9]+)$"
+if(-not $cuda_ver_matched){
+    Write-Output "Invalid CUDNN version specified, <major>.<minor>.<patch>.<build> required. '$CUDNN_VERSION_FULL'."
+    exit 1
+}
+$CUDNN_MAJOR=$Matches.major
+$CUDNN_MINOR=$Matches.minor
+$CUDNN_PATCH=$Matches.patch
+$CUDNN_BUILD=$Matches.build
 
 ## ------------------------------------------------
 ## Select CUDA packages to install from environment
@@ -116,9 +126,10 @@ $CUDA_PATH_VX_Y = "CUDA_PATH_V$($CUDA_MAJOR)_$($CUDA_MINOR)"
 # Append $CUDA_PATH/bin to path.
 # Set CUDA_PATH as an environmental variable
 
-$CUDNN_ZIP_REMOTE = "https://github.com/arition/files/releases/download/files/cudnn-$($CUDA_MAJOR).$($CUDA_MINOR)-windows10-x64-v$($CUDNN_VERSION).zip"
+$CUDNN_ZIP_REMOTE = "http://developer.download.nvidia.com/compute/redist/cudnn/v$($CUDNN_MAJOR).$($CUDNN_MINOR).$($CUDNN_PATCH)/cudnn-$($CUDA_MAJOR).$($CUDA_MINOR)-windows-x64-v$($CUDNN_VERSION_FULL).zip"
 $CUDNN_ZIP_LOCAL = Join-Path $TEMP_PATH "cudnn.zip"
 
+Write-Output "Downloading CUDNN zip for $($CUDNN_VERSION_FULL) from: $($CUDNN_ZIP_REMOTE)"
 Invoke-WebRequest $CUDNN_ZIP_REMOTE -OutFile $CUDNN_ZIP_LOCAL | Out-Null
 if(Test-Path -Path $CUDNN_ZIP_LOCAL){
     Write-Output "Downloading Complete"
