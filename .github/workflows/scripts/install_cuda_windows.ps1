@@ -21,6 +21,7 @@ $CUDA_PACKAGES_IN = @(
     "cusparse_dev";
     "nvrtc_dev";
     "cudart";
+    "nsight_nvtx";
 )
 
 
