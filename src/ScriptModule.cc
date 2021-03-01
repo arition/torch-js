@@ -1,5 +1,6 @@
 #include "ScriptModule.h"
 
+#include <math.h>
 #include <exception>
 #include "Tensor.h"
 #include "utils.h"
@@ -104,8 +105,14 @@ namespace torchjs
     }
     else if (jsValue.IsNumber())
     {
-      auto jsNumber = jsValue.As<Napi::Number>().DoubleValue();
-      return c10::IValue(jsNumber);
+      auto _jsNumber = jsValue.As<Napi::Number>().DoubleValue();
+      if (fmod(_jsNumber, 1) == 0){
+        int jsNumber = int(_jsNumber);
+        return c10::IValue(jsNumber);
+      }
+      else{
+        return c10::IValue(_jsNumber);
+      }
     }
     else if (jsValue.IsBoolean())
     {
