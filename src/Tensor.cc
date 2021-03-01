@@ -19,7 +19,7 @@ namespace torchjs
         Napi::EscapableHandleScope scope(env);
         assert(tensor.is_contiguous());
         auto typed_array = Napi::TypedArrayOf<T>::New(env, tensor.numel());
-        memcpy(typed_array.Data(), tensor.data<T>(), sizeof(T) * tensor.numel());
+        memcpy(typed_array.Data(), tensor.data_ptr<T>(), sizeof(T) * tensor.numel());
         auto shape_array = tensorShapeToArray(env, tensor);
         auto obj = Napi::Object::New(env);
         obj.Set(kData, typed_array);
@@ -44,7 +44,7 @@ namespace torchjs
         torch::TensorOptions options(scalarType<T>());
         options = options.requires_grad(false);
         auto torch_tensor = torch::empty(shape, options);
-        memcpy(torch_tensor.data<T>(), data_ptr, sizeof(T) * torch_tensor.numel());
+        memcpy(torch_tensor.data_ptr<T>(), data_ptr, sizeof(T) * torch_tensor.numel());
         return scope.Escape(Tensor::FromTensor(env, torch_tensor));
       }
       catch (const std::exception &e)
