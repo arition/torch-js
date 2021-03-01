@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.14)
 project(torch-js)
 
 set(PYTORCH_VERSION 1.7.1)
-set(PYTORCH_VISION_VERSION 0.8.2)
+# set(PYTORCH_VISION_VERSION v0.9.0-rc2)
+set(PYTORCH_VISION_VERSION v0.8.2)
+# TODO: Update more version of CUDA lol
+
 find_package(CUDA)
 if(CUDA_FOUND)
   if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/build/libtorch")
@@ -37,7 +40,7 @@ if(CUDA_FOUND)
     endif()
     execute_process(
       COMMAND
-        unzip -o
+        unzip -qq -o
         ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.zip
     )
   endif()
@@ -47,19 +50,22 @@ else()
       file(
         DOWNLOAD
         https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-${PYTORCH_VERSION}%2Bcpu.zip
-        ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip)
+        ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip
+        SHOW_PROGRESS)
     elseif(APPLE)
       file(
         DOWNLOAD
         https://download.pytorch.org/libtorch/cpu/libtorch-macos-${PYTORCH_VERSION}.zip
-        ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip)
+        ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip
+        SHOW_PROGRESS)
     else()
       file(
         DOWNLOAD
         https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-${PYTORCH_VERSION}%2Bcpu.zip
-        ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip)
+        ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip
+        SHOW_PROGRESS)
     endif()
-    execute_process(COMMAND unzip -o
+    execute_process(COMMAND unzip -qq -o
                             ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip)
   endif()
 endif(CUDA_FOUND)
@@ -76,7 +82,7 @@ find_package(Torch REQUIRED)
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
   execute_process(
-    COMMAND git clone --depth 1 --branch v${PYTORCH_VISION_VERSION}
+    COMMAND git clone --depth 1 --branch ${PYTORCH_VISION_VERSION}
             https://github.com/pytorch/vision)
   execute_process(
     COMMAND
@@ -91,7 +97,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
       "${CMAKE_CURRENT_BINARY_DIR}/vision/build/")
   execute_process(
     COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}/vision/build"
-            --config Release)
+            --config Release -j${PROCESSOR_COUNT})
   execute_process(
     COMMAND
       ${CMAKE_COMMAND} --install "${CMAKE_CURRENT_BINARY_DIR}/vision/build"
