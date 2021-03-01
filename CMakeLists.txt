@@ -1,74 +1,103 @@
 cmake_minimum_required(VERSION 3.14)
 project(torch-js)
 
-set(PYTORCH_VERSION 1.7.1)
-# set(PYTORCH_VISION_VERSION v0.9.0-rc2)
-set(PYTORCH_VISION_VERSION v0.8.2)
-# TODO: Update more version of CUDA lol
+set(TORCH_VERSION 1.7.1)
+set(TORCH_DEFAULT_CUDA "102")
+# set(TORCHVISION_VERSION v0.9.0-rc2)
+set(TORCHVISION_VERSION v0.8.2)
 
-find_package(CUDA)
-if(CUDA_FOUND)
-  if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/build/libtorch")
-    if(${CUDA_VERSION_MAJOR} EQUAL 10 AND ${CUDA_VERSION_MINOR} EQUAL 2)
-      if(WIN32)
-        file(
-          DOWNLOAD
-          https://download.pytorch.org/libtorch/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}/libtorch-win-shared-with-deps-${PYTORCH_VERSION}.zip
-          ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.zip
-          SHOW_PROGRESS)
-      else()
-        file(
-          DOWNLOAD
-          https://download.pytorch.org/libtorch/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}/libtorch-cxx11-abi-shared-with-deps-${PYTORCH_VERSION}.zip
-          ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.zip
-          SHOW_PROGRESS)
-      endif()
-    else()
-      if(WIN32)
-        file(
-          DOWNLOAD
-          https://download.pytorch.org/libtorch/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}/libtorch-win-shared-with-deps-${PYTORCH_VERSION}%2Bcu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.zip
-          ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.zip
-          SHOW_PROGRESS)
-      else()
-        file(
-          DOWNLOAD
-          https://download.pytorch.org/libtorch/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}/libtorch-cxx11-abi-shared-with-deps-${PYTORCH_VERSION}%2Bcu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.zip
-          ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.zip
-          SHOW_PROGRESS)
-      endif()
+
+# Not had libtorch at source dir
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/build/libtorch/")
+  find_package(CUDA)
+  if(CUDA_FOUND)
+    # Check for unsupported CUDA version
+    if(NOT "${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}" MATCHES
+       "^(101|102|110)$")
+      message(
+        FATAL_ERROR
+          "${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR} are not provided by libtorch. Please build from source and place it at ${CMAKE_CURRENT_BINARY_DIR}/libtorch/"
+      )
     endif()
-    execute_process(
-      COMMAND
-        unzip -qq -o
-        ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.zip
+    set(LIBTORCH_SAVE_PATH
+        "${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.zip"
     )
-  endif()
-else()
-  if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/build/libtorch")
-    if(WIN32)
-      file(
-        DOWNLOAD
-        https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-${PYTORCH_VERSION}%2Bcpu.zip
-        ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip
-        SHOW_PROGRESS)
-    elseif(APPLE)
-      file(
-        DOWNLOAD
-        https://download.pytorch.org/libtorch/cpu/libtorch-macos-${PYTORCH_VERSION}.zip
-        ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip
-        SHOW_PROGRESS)
-    else()
-      file(
-        DOWNLOAD
-        https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-${PYTORCH_VERSION}%2Bcpu.zip
-        ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip
-        SHOW_PROGRESS)
+    if(NOT EXISTS ${LIBTORCH_SAVE_PATH})
+      if(WIN32)
+        if("${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}" STREQUAL
+           ${TORCH_DEFAULT_CUDA})
+          set(DOWNLOAD_LINK
+              "https://download.pytorch.org/libtorch/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}/libtorch-win-shared-with-deps-${TORCH_VERSION}.zip"
+          )
+          message(
+            STATUS "Downloading libtorch for Windows from ${DOWNLOAD_LINK}")
+          file(DOWNLOAD ${DOWNLOAD_LINK} ${LIBTORCH_SAVE_PATH})
+        else()
+          set(DOWNLOAD_LINK
+              "https://download.pytorch.org/libtorch/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}/libtorch-win-shared-with-deps-${TORCH_VERSION}%2Bcu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}-.zip"
+          )
+          message(
+            STATUS "Downloading libtorch for Windows from ${DOWNLOAD_LINK}")
+          file(DOWNLOAD ${DOWNLOAD_LINK} ${LIBTORCH_SAVE_PATH})
+        endif()
+      elseif(APPLE)
+        message(
+          SEND_ERROR
+            "MacOS does not support NVIDIA GPU, hence CUDA, will use the CPU version instead"
+        )
+        set(DOWNLOAD_LINK
+            "https://download.pytorch.org/libtorch/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}/libtorch-macos-${TORCH_VERSION}.zip"
+        )
+        message(STATUS "Downloading libtorch for MacOS from ${DOWNLOAD_LINK}")
+        file(DOWNLOAD ${DOWNLOAD_LINK} ${LIBTORCH_SAVE_PATH})
+      else()
+        if("${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}" STREQUAL
+           ${TORCH_DEFAULT_CUDA})
+          set(DOWNLOAD_LINK
+              "https://download.pytorch.org/libtorch/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}/libtorch-shared-with-deps-${TORCH_VERSION}.zip"
+          )
+          message(STATUS "Downloading libtorch for Linux from ${DOWNLOAD_LINK}")
+          file(DOWNLOAD ${DOWNLOAD_LINK} ${LIBTORCH_SAVE_PATH})
+        else()
+          set(DOWNLOAD_LINK
+              "https://download.pytorch.org/libtorch/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}/libtorch-shared-with-deps-${TORCH_VERSION}%2Bcu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.zip"
+          )
+          message(STATUS "Downloading libtorch for Linux from ${DOWNLOAD_LINK}")
+          file(DOWNLOAD ${DOWNLOAD_LINK} ${LIBTORCH_SAVE_PATH})
+        endif()
+      endif()
     endif()
-    execute_process(COMMAND unzip -qq -o
-                            ${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip)
-  endif()
-endif(CUDA_FOUND)
+    message(STATUS "Unziping ${LIBTORCH_SAVE_PATH}")
+    execute_process(COMMAND unzip -qq -o ${LIBTORCH_SAVE_PATH})
+  else()
+    set(LIBTORCH_SAVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch-cpu.zip")
+    if(NOT EXISTS ${LIBTORCH_SAVE_PATH})
+      if(WIN32)
+        set(DOWNLOAD_LINK
+            "https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-${TORCH_VERSION}%2Bcpu.zip"
+        )
+        message(STATUS "Downloading libtorch for Windows from ${DOWNLOAD_LINK}")
+        file(DOWNLOAD ${DOWNLOAD_LINK} ${LIBTORCH_SAVE_PATH})
+      elseif(APPLE)
+        set(DOWNLOAD_LINK
+            "https://download.pytorch.org/libtorch/cpu/libtorch-macos-${TORCH_VERSION}.zip"
+        )
+        message(STATUS "Downloading libtorch for MacOS from ${DOWNLOAD_LINK}")
+        file(DOWNLOAD ${DOWNLOAD_LINK} ${LIBTORCH_SAVE_PATH})
+      else()
+        set(DOWNLOAD_LINK
+            "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-${TORCH_VERSION}%2Bcpu.zip"
+        )
+        message(STATUS "Downloading libtorch for Linux from ${DOWNLOAD_LINK}")
+        file(DOWNLOAD ${DOWNLOAD_LINK} ${LIBTORCH_SAVE_PATH})
+      endif()
+    endif()
+    message(STATUS "Unziping ${LIBTORCH_SAVE_PATH}")
+    execute_process(COMMAND unzip -qq -o ${LIBTORCH_SAVE_PATH})
+  endif(CUDA_FOUND)
+else()
+  message(STATUS "libtorch found in ${CMAKE_CURRENT_BINARY_DIR}/libtorch/")
+endif()
 
 # Use C++14
 set(CMAKE_CXX_STANDARD 14)
@@ -82,7 +111,7 @@ find_package(Torch REQUIRED)
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
   execute_process(
-    COMMAND git clone --depth 1 --branch ${PYTORCH_VISION_VERSION}
+    COMMAND git clone --depth 1 --branch ${TORCHVISION_VERSION}
             https://github.com/pytorch/vision)
   execute_process(
     COMMAND
