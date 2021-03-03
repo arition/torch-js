@@ -159,6 +159,7 @@ namespace torchjs
       auto firstElement = JSTypeToIValue(env, jsList[(uint32_t)0]).first;
       bool is_list_of_tensor = firstElement.isTensor();
       c10::List<c10::IValue> list(firstElement.type());
+      list.push_back(firstElement);
       for (uint32_t i = 1; i < len; ++i)
       {
         list.push_back(JSTypeToIValue(env, jsList[i]).first); // Drop the last boolean
