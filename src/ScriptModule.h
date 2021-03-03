@@ -19,6 +19,7 @@ namespace torchjs
     std::string path_;
 
     Napi::Value forward(const Napi::CallbackInfo &info);
+    Napi::Value call_scripted_function(const Napi::CallbackInfo &info);
     Napi::Value toString(const Napi::CallbackInfo &info);
     Napi::Value cpu(const Napi::CallbackInfo &info);
     Napi::Value cuda(const Napi::CallbackInfo &info);

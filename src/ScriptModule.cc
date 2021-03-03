@@ -12,6 +12,7 @@ namespace torchjs
   {
     Napi::Function func = DefineClass(env, "ScriptModule",
                                       {InstanceMethod("forward", &ScriptModule::forward),
+                                       InstanceMethod("call_scripted_function", &ScriptModule::call_scripted_function),
                                        InstanceMethod("toString", &ScriptModule::toString),
                                        InstanceMethod("cpu", &ScriptModule::cpu),
                                        InstanceMethod("cuda", &ScriptModule::cuda),
@@ -60,6 +61,54 @@ namespace torchjs
           [=]() -> c10::IValue {
             torch::NoGradGuard no_grad;
             return module_.forward(inputs);
+          },
+          [=](Napi::Env env, c10::IValue value) -> Napi::Value {
+            return IValueToJSType(env, value);
+          });
+
+      worker->Queue();
+      return worker->GetPromise();
+    }
+    catch (const std::exception &e)
+    {
+      throw Napi::Error::New(info.Env(), e.what());
+    }
+  }
+
+  Napi::Value ScriptModule::call_scripted_function(const Napi::CallbackInfo &info)
+  {
+    try
+    {
+      torch::NoGradGuard no_grad;
+      module_.eval();
+
+      // Parse and check input arguments
+      auto len = info.Length();
+      if (len <= 1){
+        throw Napi::Error::New(info.Env(), "call_scripted_function required at least 2 arguments: (function_name, **inputs)");
+      }
+
+      auto first_arg = info[0];
+      std::string function_name;
+      if (first_arg.IsString()){
+        function_name = first_arg.As<Napi::String>().Utf8Value();
+      }
+      else{
+        throw Napi::Error::New(info.Env(), "function_name must be a string");
+      }
+
+      auto inputs = std::vector<torch::jit::IValue>();
+      for (size_t i = 1; i < len; ++i)
+      {
+        inputs.push_back(JSTypeToIValue(info.Env(), info[i]));
+      }
+
+      // Call method by string here
+      auto worker = new FunctionWorker<c10::IValue>(
+          info.Env(),
+          [=]() -> c10::IValue {
+            torch::NoGradGuard no_grad;
+            return module_.get_method(function_name)(inputs);
           },
           [=](Napi::Env env, c10::IValue value) -> Napi::Value {
             return IValueToJSType(env, value);
