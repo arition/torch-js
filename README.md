@@ -19,7 +19,7 @@ TorchJS is a JS binding for PyTorch. Its primary objective is to allow running [
 To install the forked version, you can install it from npm:
 
 ```bash
-yarn add torch-js@npm:@arition/torch-js
+yarn add torch-js@npm:@lamhoangtung/torch-js
 ```
 
 ## Example
