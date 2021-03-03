@@ -25,7 +25,7 @@ namespace torchjs
     Napi::Value cuda(const Napi::CallbackInfo &info);
     static Napi::Value isCudaAvailable(const Napi::CallbackInfo &info);
     static Napi::Value IValueToJSType(Napi::Env env, const c10::IValue &iValue);
-    static c10::IValue JSTypeToIValue(Napi::Env env, const Napi::Value &jsValue);
+    static std::pair<c10::IValue, bool> JSTypeToIValue(Napi::Env env, const Napi::Value &jsValue);
   };
 
 } // namespace torchjs

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "ScriptModule.h"
 
 #include <math.h>
@@ -53,9 +54,20 @@ namespace torchjs
       auto inputs = std::vector<torch::jit::IValue>();
       for (size_t i = 0; i < len; ++i)
       {
-        inputs.push_back(JSTypeToIValue(info.Env(), info[i]));
+        std::pair<c10::IValue, bool> current_arg = JSTypeToIValue(info.Env(), info[i]);
+        bool is_list_of_tensor = current_arg.second;
+        if (is_list_of_tensor)
+        {
+          auto current_arg_vector = current_arg.first.toTensorVector(); // The dirty fix for List[Tensor]
+          inputs.push_back(current_arg_vector);
+        }
+        else
+        {
+          auto current_arg_value = current_arg.first;
+          inputs.push_back(current_arg_value);
+        }
       }
-      
+
       auto worker = new FunctionWorker<c10::IValue>(
           info.Env(),
           [=]() -> c10::IValue {
@@ -100,7 +112,16 @@ namespace torchjs
       auto inputs = std::vector<torch::jit::IValue>();
       for (size_t i = 1; i < len; ++i)
       {
-        inputs.push_back(JSTypeToIValue(info.Env(), info[i]));
+        std::pair<c10::IValue, bool> current_arg = JSTypeToIValue(info.Env(), info[i]);
+        bool is_list_of_tensor = current_arg.second;
+        if (is_list_of_tensor){
+          auto current_arg_vector = current_arg.first.toTensorVector(); // The dirty fix for List[Tensor]
+          inputs.push_back(current_arg_vector);
+        }
+        else{
+          auto current_arg_value = current_arg.first;
+          inputs.push_back(current_arg_value);
+        }
       }
 
       // Call method by string here
@@ -123,7 +144,7 @@ namespace torchjs
     }
   }
 
-  c10::IValue ScriptModule::JSTypeToIValue(Napi::Env env, const Napi::Value &jsValue)
+  std::pair<c10::IValue, bool> ScriptModule::JSTypeToIValue(Napi::Env env, const Napi::Value &jsValue)
   {
     Napi::HandleScope scope(env);
     if (jsValue.IsArray())
@@ -134,13 +155,21 @@ namespace torchjs
       {
         throw Napi::Error::New(env, "Empty array is not supported");
       }
-      auto firstElement = JSTypeToIValue(env, jsList[(uint32_t)0]);
+
+      auto firstElement = JSTypeToIValue(env, jsList[(uint32_t)0]).first;
+      bool is_list_of_tensor = firstElement.isTensor();
       c10::List<c10::IValue> list(firstElement.type());
       for (uint32_t i = 1; i < len; ++i)
       {
-        list.push_back(JSTypeToIValue(env, jsList[i]));
+        list.push_back(JSTypeToIValue(env, jsList[i]).first); // Drop the last boolean
       }
-      return list;
+      // NOTE: For some reason, the conversion of List[Tensor] with c10:IValue will
+      // not be interpreted properly. I had found a workaround by calling toTensorVector()
+      // Then readded it into the vector<torch::jit::IValue>. Since this only works for 
+      // List[Tensor]. I need to return a boolean to know weather or not the input had
+      // a list of Tensor
+      std::pair<c10::IValue, bool> res(list, is_list_of_tensor);
+      return res;
     }
     else if (jsValue.IsObject())
     {
@@ -148,7 +177,9 @@ namespace torchjs
       if (Tensor::IsInstance(jsObject))
       {
         auto tensor = Napi::ObjectWrap<Tensor>::Unwrap(jsObject);
-        return c10::IValue(tensor->tensor());
+        auto value =  c10::IValue(tensor->tensor());
+        std::pair<c10::IValue, bool> res(value, false);
+        return res;
       }
       throw Napi::Error::New(env, "Object/Dict input is not implemented");
     }
@@ -157,21 +188,29 @@ namespace torchjs
       auto _jsNumber = jsValue.As<Napi::Number>().DoubleValue();
       if (fmod(_jsNumber, 1) == 0){
         int jsNumber = int(_jsNumber);
-        return c10::IValue(jsNumber);
+        auto value = c10::IValue(jsNumber);
+        std::pair<c10::IValue, bool> res(value, false);
+        return res;
       }
       else{
-        return c10::IValue(_jsNumber);
+        auto value = c10::IValue(_jsNumber);
+        std::pair<c10::IValue, bool> res(value, false);
+        return res;
       }
     }
     else if (jsValue.IsBoolean())
     {
       auto jsBool = jsValue.As<Napi::Boolean>().Value();
-      return c10::IValue(jsBool);
+      auto value = c10::IValue(jsBool);
+      std::pair<c10::IValue, bool> res(value, false);
+      return res;
     }
     else if (jsValue.IsString())
     {
       auto jsString = jsValue.As<Napi::String>().Utf8Value();
-      return c10::IValue(jsString);
+      auto value =  c10::IValue(jsString);
+      std::pair<c10::IValue, bool> res(value, false);
+      return res;
     }
     throw Napi::Error::New(env, "Unsupported javascript input type");
   }

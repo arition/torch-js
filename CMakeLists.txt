@@ -137,6 +137,8 @@ set(CMAKE_PREFIX_PATH
     ${CMAKE_PREFIX_PATH};${CMAKE_CURRENT_BINARY_DIR}/torchvision/)
 find_package(TorchVision)
 
+# find_package( Boost 1.40 REQUIRED COMPONENTS system filesystem)
+
 if(WIN32)
 
 elseif(APPLE)
@@ -166,6 +168,8 @@ target_link_libraries(${PROJECT_NAME} ${TORCH_LIBRARIES})
 target_include_directories(
   ${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/torchvision/include")
 target_link_libraries(${PROJECT_NAME} TorchVision::TorchVision)
+
+# target_link_libraries(${PROJECT_NAME} "${Boost_LIBRARIES}")
 
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
