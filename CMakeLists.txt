@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
 project(torch-js)
 
-set(TORCH_VERSION 1.7.1)
+set(TORCH_VERSION 1.8.0)
 set(TORCH_DEFAULT_CUDA "102")
-# set(TORCHVISION_VERSION v0.9.0-rc2)
-set(TORCHVISION_VERSION v0.8.2)
+set(TORCHVISION_VERSION v0.9.0)
 
 
 # Not had libtorch at source dir
@@ -13,7 +12,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/build/libtorch/")
   if(CUDA_FOUND)
     # Check for unsupported CUDA version
     if(NOT "${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}" MATCHES
-       "^(101|102|110)$")
+       "^(102|111)$")
       message(
         FATAL_ERROR
           "${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR} are not provided by libtorch. Please build from source and place it at ${CMAKE_CURRENT_BINARY_DIR}/libtorch/"
@@ -94,6 +93,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/build/libtorch/")
     endif()
     message(STATUS "Unziping ${LIBTORCH_SAVE_PATH}")
     execute_process(COMMAND unzip -qq -o ${LIBTORCH_SAVE_PATH})
+    # set_property(TARGET ${PROJECT_NAME} PROPERTY CUDA_ARCHITECTURES 60 61 62 70 72 75 80 86)
   endif(CUDA_FOUND)
 else()
   message(STATUS "libtorch found in ${CMAKE_CURRENT_BINARY_DIR}/libtorch/")
