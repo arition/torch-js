@@ -110,14 +110,21 @@ set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_BINARY_DIR}/libtorch/)
 find_package(Torch REQUIRED)
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
-  execute_process(
-    COMMAND git clone --depth 1 --branch ${TORCHVISION_VERSION}
-            https://github.com/pytorch/vision)
-  execute_process(
-    COMMAND
-      git -C "${CMAKE_CURRENT_BINARY_DIR}/vision/" apply
-      "${CMAKE_CURRENT_SOURCE_DIR}/patches/0001-Remove-native-image-support.patch"
+  set(TORCHVISON_SAVE_PATH
+      "${CMAKE_CURRENT_SOURCE_DIR}/torchvision-${TORCHVISION_VERSION}.zip"
   )
+  if(NOT EXISTS ${TORCHVISON_SAVE_PATH})
+    set(DOWNLOAD_LINK
+        "https://github.com/pytorch/vision/archive/refs/tags/${TORCHVISION_VERSION}.zip"
+    )
+    message(
+      STATUS "Downloading torchvsion from ${DOWNLOAD_LINK}")
+    file(DOWNLOAD ${DOWNLOAD_LINK} ${TORCHVISON_SAVE_PATH})
+  endif()
+  message(STATUS "Unziping ${TORCHVISON_SAVE_PATH}")
+  execute_process(COMMAND unzip -qq -o ${TORCHVISON_SAVE_PATH})
+  string(REPLACE "v" "" TORCHVISON_VERSION_NUM_ONLY ${TORCHVISION_VERSION})
+  execute_process(COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/vision-${TORCHVISON_VERSION_NUM_ONLY} ${CMAKE_CURRENT_BINARY_DIR}/vision)
   execute_process(
     COMMAND
       ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=${CUDA_FOUND}
@@ -131,6 +138,8 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
     COMMAND
       ${CMAKE_COMMAND} --install "${CMAKE_CURRENT_BINARY_DIR}/vision/build"
       --prefix "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
+else()
+  message(STATUS "torchvision found in ${CMAKE_CURRENT_BINARY_DIR}/torchvision")
 endif()
 
 set(CMAKE_PREFIX_PATH
