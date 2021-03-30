@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
 project(torch-js)
 
-set(TORCH_VERSION 1.8.0)
+set(TORCH_VERSION 1.8.1)
 set(TORCH_DEFAULT_CUDA "102")
-set(TORCHVISION_VERSION v0.9.0)
+set(TORCHVISION_VERSION v0.9.1)
 
 
 # Not had libtorch at source dir
@@ -93,7 +93,6 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/build/libtorch/")
     endif()
     message(STATUS "Unziping ${LIBTORCH_SAVE_PATH}")
     execute_process(COMMAND unzip -qq -o ${LIBTORCH_SAVE_PATH})
-    # set_property(TARGET ${PROJECT_NAME} PROPERTY CUDA_ARCHITECTURES 60 61 62 70 72 75 80 86)
   endif(CUDA_FOUND)
 else()
   message(STATUS "libtorch found in ${CMAKE_CURRENT_BINARY_DIR}/libtorch/")
@@ -104,6 +103,15 @@ set(CMAKE_CXX_STANDARD 14)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Set CUDA_ARCHITECTURES
+if(CUDA_FOUND)
+  if("${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}" MATCHES "^102$")
+    set(TORCH_CUDA_ARCH_LIST "6.0+PTX;6.1+PTX;6.2+PTX;7.0+PTX;7.2+PTX;7.5+PTX")
+  elseif("${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}" MATCHES "^111$")
+    set(TORCH_CUDA_ARCH_LIST "6.0+PTX;6.1+PTX;6.2+PTX;7.0+PTX;7.2+PTX;7.5+PTX;8.0+PTX;8.6+PTX")
+  endif()
 endif()
 
 set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_BINARY_DIR}/libtorch/)
@@ -125,12 +133,37 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
   execute_process(COMMAND unzip -qq -o ${TORCHVISON_SAVE_PATH})
   string(REPLACE "v" "" TORCHVISON_VERSION_NUM_ONLY ${TORCHVISION_VERSION})
   execute_process(COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/vision-${TORCHVISON_VERSION_NUM_ONLY} ${CMAKE_CURRENT_BINARY_DIR}/vision)
-  execute_process(
-    COMMAND
-      ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=${CUDA_FOUND}
-      -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/libtorch -S
-      "${CMAKE_CURRENT_BINARY_DIR}/vision/" -B
-      "${CMAKE_CURRENT_BINARY_DIR}/vision/build/")
+  message(STATUS "Compliling torchvision")
+  if(CUDA_FOUND)
+    # patch torchvision with a proper CUDA_ARCHITECTURES list like:
+    # set_property(TARGET torchvision PROPERTY CUDA_ARCHITECTURES 60 61 62 70 72 75 80 86)
+    if("${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}" MATCHES "^102$")
+      execute_process(
+        COMMAND
+          sed -i "103 i set_property(TARGET torchvision PROPERTY CUDA_ARCHITECTURES 60 61 62 70 72 75)" "${CMAKE_CURRENT_BINARY_DIR}/vision/CMakeLists.txt")
+    elseif("${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}" MATCHES "^111$")
+      execute_process(
+        COMMAND
+          sed -i "103 i set_property(TARGET torchvision PROPERTY CUDA_ARCHITECTURES 60 61 62 70 72 75 80 86)" "${CMAKE_CURRENT_BINARY_DIR}/vision/CMakeLists.txt")
+    endif()
+        execute_process(
+      COMMAND
+        ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=${CUDA_FOUND}
+        -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/libtorch
+        "-DTORCH_CUDA_ARCH_LIST=${TORCH_CUDA_ARCH_LIST}" -S
+        "${CMAKE_CURRENT_BINARY_DIR}/vision/" -B
+        "${CMAKE_CURRENT_BINARY_DIR}/vision/build/"
+      COMMAND_ECHO
+        STDOUT
+      )
+  else()
+    execute_process(
+      COMMAND
+        ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=${CUDA_FOUND}
+        -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/libtorch -S
+        "${CMAKE_CURRENT_BINARY_DIR}/vision/" -B
+        "${CMAKE_CURRENT_BINARY_DIR}/vision/build/")
+  endif()
   execute_process(
     COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}/vision/build"
             --config Release -j${PROCESSOR_COUNT})
