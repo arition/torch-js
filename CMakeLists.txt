@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.18)
 project(torch-js)
 
 set(TORCH_VERSION 1.8.1)
