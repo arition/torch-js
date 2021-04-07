@@ -1,13 +1,13 @@
 {
-  "name": "@techainer/torch-js",
+  "name": "@techainer1t/torch-js",
   "version": "0.12.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "author": "Kittipat Virochsiri, arition, raghavmecheri",
+  "author": "Kittipat Virochsiri, arition, raghavmecheri, lamhoangtung",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arition/torch-js.git"
+    "url": "git+https://github.com/Techainer/torch-js"
   },
   "scripts": {
     "install": "prebuild-install -r napi || cmake-js compile",
