@@ -166,7 +166,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
   endif()
   execute_process(
     COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}/vision/build"
-            --config Release -j${PROCESSOR_COUNT})
+            --config Release)
   execute_process(
     COMMAND
       ${CMAKE_COMMAND} --install "${CMAKE_CURRENT_BINARY_DIR}/vision/build"
