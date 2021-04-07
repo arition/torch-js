@@ -138,7 +138,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
   # Use the VCPKG toolchain file for cmake
   set(VCPKG_CMAKE_FLAG "")
   if (WIN32)
-    execute_process(COMMAND CMD /c where vckpg OUTPUT_VARIABLE VCPKG_CMAKE_FLAG)
+    execute_process(COMMAND where.exe vckpg OUTPUT_VARIABLE VCPKG_CMAKE_FLAG)
     set (VCPKG_CMAKE_FLAG "-DCMAKE_TOOLCHAIN_FILE=${VCPKG_CMAKE_FLAG}")
   endif()
 
