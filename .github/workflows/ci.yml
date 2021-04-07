@@ -35,7 +35,7 @@ jobs:
       - name: Install other dependency on windows
         if: ${{ matrix.os == 'windows-latest' }}
         shell: powershell
-        run: nuget install libpng
+        run: vcpkg install libpng
 
       - name: Install packages
         run: yarn upgrade --dev
