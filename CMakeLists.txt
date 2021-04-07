@@ -156,10 +156,11 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
     execute_process(
       COMMAND
         ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=${CUDA_FOUND}
+        "${VCPKG_CMAKE_FLAG}"
         -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/libtorch
         "-DTORCH_CUDA_ARCH_LIST=${TORCH_CUDA_ARCH_LIST}" -S
         "${CMAKE_CURRENT_BINARY_DIR}/vision/" -B
-        "${CMAKE_CURRENT_BINARY_DIR}/vision/build/ ${VCPKG_CMAKE_FLAG}"
+        "${CMAKE_CURRENT_BINARY_DIR}/vision/build/"
       COMMAND_ECHO
       STDOUT
     )
@@ -167,9 +168,13 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
     execute_process(
       COMMAND
         ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=${CUDA_FOUND}
+        "${VCPKG_CMAKE_FLAG}"
         -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/libtorch -S
         "${CMAKE_CURRENT_BINARY_DIR}/vision/" -B
-        "${CMAKE_CURRENT_BINARY_DIR}/vision/build/ ${VCPKG_CMAKE_FLAG}")
+        "${CMAKE_CURRENT_BINARY_DIR}/vision/build/"
+      COMMAND_ECHO
+      STDOUT
+    )
   endif()
   execute_process(
     COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}/vision/build"
