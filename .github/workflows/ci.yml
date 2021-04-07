@@ -32,10 +32,10 @@ jobs:
         with:
           python-version: "3.8"
 
-      - name: Install choco dependency on windows
+      - name: Install other dependency on windows
         if: ${{ matrix.os == 'windows-latest' }}
         shell: powershell
-        run: choco install libpng
+        run: nuget install libpng
 
       - name: Install packages
         run: yarn upgrade --dev
