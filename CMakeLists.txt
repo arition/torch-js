@@ -138,7 +138,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
   # Use the VCPKG toolchain file for cmake
   set(VCPKG_CMAKE_FLAG "")
   if (WIN32)
-    set (VCPKG_CMAKE_FLAG "-DCMAKE_TOOLCHAIN_FILE=$(where vckpg)/scripts/buildsystems/vcpkg.cmake")
+    set (VCPKG_CMAKE_FLAG "-DCMAKE_TOOLCHAIN_FILE=$(where.exe vckpg)/scripts/buildsystems/vcpkg.cmake")
   endif()
 
   if(CUDA_FOUND)
