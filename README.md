@@ -1,9 +1,10 @@
 # TorchJS
 
-[![npm version](https://badge.fury.io/js/%40arition%2Ftorch-js.svg)](https://badge.fury.io/js/%40arition%2Ftorch-js)
+[![npm version](https://badge.fury.io/js/%40techainer1t%2Ftorch-js.svg)](https://badge.fury.io/js/%40techainer1t%2Ftorch-js)
 
-TorchJS is a JS binding for PyTorch. Its primary objective is to allow running [Torch Script](https://pytorch.org/docs/master/jit.html) inside Node.js program. Complete binding of libtorch is possible but is out-of-scope at the moment.
+TorchJS is a JS binding for PyTorch. Its primary objective is to allow running [TorchScript](https://pytorch.org/docs/master/jit.html) inside Node.js program. Complete binding of libtorch is possible but is out-of-scope at the moment.
 
+This fork is maintained by [Techainer](https://techainer.com).
 ## Changes after fork
 
 - Add support for `List` (Javascript `Array`), `Dict` (Javascript `Object`), `String`, `float` (Javascript `number`) as inputs and outputs.
@@ -13,6 +14,10 @@ TorchJS is a JS binding for PyTorch. Its primary objective is to allow running [
 - Add ops from torchvision.
 
 - Add async support for `forward` function.
+
+- Add async support for `call_scripted_function(function_name, **inputs)` to call any method of the scripted module.
+
+- Fixed some werid conversion arround `List[Tensor]` input.
 
 ## Install
 
