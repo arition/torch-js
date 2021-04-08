@@ -134,20 +134,8 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
   string(REPLACE "v" "" TORCHVISON_VERSION_NUM_ONLY ${TORCHVISION_VERSION})
   execute_process(COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/vision-${TORCHVISON_VERSION_NUM_ONLY} ${CMAKE_CURRENT_BINARY_DIR}/vision)
   message(STATUS "Compliling torchvision")
-  
-  # Use the VCPKG toolchain file for cmake
-  set(VCPKG_CMAKE_FLAG "")
-  # if (WIN32)
-    # Automatic way
-    # execute_process(COMMAND where.exe vcpkg OUTPUT_VARIABLE VCPKG_CMAKE_FLAG OUTPUT_STRIP_TRAILING_WHITESPACE)
-    # set (VCPKG_CMAKE_FLAG "-DCMAKE_TOOLCHAIN_FILE=${VCPKG_CMAKE_FLAG}")
-    # string(REPLACE "vcpkg.exe" "" VCPKG_CMAKE_FLAG ${VCPKG_CMAKE_FLAG})
-    # string(REPLACE "\\" "/" VCPKG_CMAKE_FLAG ${VCPKG_CMAKE_FLAG})
-    # set (VCPKG_CMAKE_FLAG "${VCPKG_CMAKE_FLAG}scripts/buildsystems/vcpkg.cmake")
 
-    # Manual and static way
-    # set (VCPKG_CMAKE_FLAG "-DCMAKE_TOOLCHAIN_FILE=C:/src/vcpkg/scripts/buildsystems/vcpkg.cmake")
-  # endif()
+
 
   if(CUDA_FOUND)
     # patch torchvision with a proper CUDA_ARCHITECTURES list like:
@@ -164,7 +152,6 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
     execute_process(
       COMMAND
         ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=${CUDA_FOUND}
-        "${VCPKG_CMAKE_FLAG}"
         -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/libtorch
         "-DTORCH_CUDA_ARCH_LIST=${TORCH_CUDA_ARCH_LIST}" -S
         "${CMAKE_CURRENT_BINARY_DIR}/vision/" -B
@@ -176,7 +163,6 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
     execute_process(
       COMMAND
         ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=${CUDA_FOUND}
-        "${VCPKG_CMAKE_FLAG}"
         -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/libtorch -S
         "${CMAKE_CURRENT_BINARY_DIR}/vision/" -B
         "${CMAKE_CURRENT_BINARY_DIR}/vision/build/"
