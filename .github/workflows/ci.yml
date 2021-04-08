@@ -35,7 +35,10 @@ jobs:
       - name: Install other dependency on windows
         if: ${{ matrix.os == 'windows-latest' }}
         shell: powershell
-        run: vcpkg install libpng
+        run: |
+          git clone https://github.com/microsoft/vcpkg C:/src/vcpkg
+          C:/src/vcpkg/bootstrap-vcpkg.bat
+          C:/src/vcpkg/vcpkg install libpng
 
       - name: Install packages
         run: yarn upgrade --dev
