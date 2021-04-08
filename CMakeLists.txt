@@ -137,7 +137,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
   
   # Use the VCPKG toolchain file for cmake
   set(VCPKG_CMAKE_FLAG "")
-  if (WIN32)
+  # if (WIN32)
     # Automatic way
     # execute_process(COMMAND where.exe vcpkg OUTPUT_VARIABLE VCPKG_CMAKE_FLAG OUTPUT_STRIP_TRAILING_WHITESPACE)
     # set (VCPKG_CMAKE_FLAG "-DCMAKE_TOOLCHAIN_FILE=${VCPKG_CMAKE_FLAG}")
@@ -146,8 +146,8 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/torchvision")
     # set (VCPKG_CMAKE_FLAG "${VCPKG_CMAKE_FLAG}scripts/buildsystems/vcpkg.cmake")
 
     # Manual and static way
-    set (VCPKG_CMAKE_FLAG "-DCMAKE_TOOLCHAIN_FILE=C:/src/vcpkg/scripts/buildsystems/vcpkg.cmake")
-  endif()
+    # set (VCPKG_CMAKE_FLAG "-DCMAKE_TOOLCHAIN_FILE=C:/src/vcpkg/scripts/buildsystems/vcpkg.cmake")
+  # endif()
 
   if(CUDA_FOUND)
     # patch torchvision with a proper CUDA_ARCHITECTURES list like:
