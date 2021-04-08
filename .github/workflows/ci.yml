@@ -40,7 +40,6 @@ jobs:
           C:/src/vcpkg/bootstrap-vcpkg.bat
           C:/src/vcpkg/vcpkg integrate install
           C:/src/vcpkg/vcpkg install libpng
-          type C:/src/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Install packages
         run: yarn upgrade --dev
