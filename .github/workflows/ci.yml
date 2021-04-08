@@ -32,11 +32,13 @@ jobs:
         with:
           python-version: "3.8"
 
-      - name: Install conda and other dependency on windows
+      - name: Install conda on Windows
         if: ${{ matrix.os == 'windows-latest' }}
         uses: s-weigand/setup-conda@v1
-        run: |
-          conda install -y libpng libjpeg
+      
+      - name: Install cmake dependency on Windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: conda install -y libpng libjpeg
 
       - name: Install packages
         run: yarn upgrade --dev
